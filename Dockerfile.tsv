@@ -1,0 +1,73 @@
+# Header
+
+# Bootstrap agent as Library and image as ubuntu version 18.04
+Bootstrap: library
+From: ubuntu:18.04
+
+
+# Sections (Optional)
+# order of execution below
+
+%post
+    # install required software packages for ubuntu
+    apt-get update -y && apt-get upgrade -y 
+    apt-get install -y wget
+
+
+    # install prerequisite libraries
+    apt-get install -y autoconf automake make gcc perl zlib1g-dev libbz2-dev liblzma-dev libcurl4-gnutls-dev libssl-dev libperl-dev libgsl0-dev
+    
+    # download bcftools in the /usr/local directory
+    cd /usr/local
+    wget https://github.com/samtools/bcftools/releases/download/1.10.2/bcftools-1.10.2.tar.bz2
+    
+    # extract the downloaded package and install bcftools
+    tar xvjf bcftools-1.10.2.tar.bz2
+    rm bcftools-1.10.2.tar.bz2
+    cd bcftools-1.10.2/
+    ./configure
+    make
+    make install
+    
+    # store date and time container was created
+
+    NOW=`date`
+    echo "export NOW=\"${NOW}\"" >> $SINGULARITY_ENVIRONMENT
+
+
+%test
+    # run bcftools command to display version
+    echo "container was created $NOW"
+    bcftools --version
+
+    # display status of image 
+     
+    grep -q NAME=\"Ubuntu\" /etc/os-release
+    if [ $? -eq 0 ]; then
+        echo "Container base is Ubuntu as expected."
+    else
+        echo "Container base is not Ubuntu."
+        exit 1
+    fi
+
+    
+%environment
+
+
+
+
+%runscript
+    # starts an interracive bcftools session
+    bcftools
+    echo "Container was created $NOW"
+    echo "Arguments received: $*"
+
+
+%labels
+    Author olofinsae.samson@gmail.com
+    github https://github.com/samson-olofinsae
+    Version v18.04
+
+
+%help
+A container to demonstrate imaeg built from a def file. Image based on ubuntu:18.04 with bcftools installed
