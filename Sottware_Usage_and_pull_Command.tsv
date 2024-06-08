@@ -1,0 +1,3 @@
+Singularity hub: https://cloud.sylabs.io/library/samson/olofinsae/ubuntu_bcftools
+
+Singularity pull command: singularity pull --arch amd64 library://samson/olofinsae/ubuntu_bcftools:tag
